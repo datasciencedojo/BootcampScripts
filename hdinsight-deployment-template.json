@@ -5,11 +5,7 @@
 		"clusterType": {
 			"type": "string",
 			"allowedValues": [
-        "hadoop",
-				"intractivehive",
-			  "hbase",
-			  "storm",
-			  "spark"
+        "hadoop"
         ],
 			"metadata": {
 				"description": "The type of the HDInsight cluster to create."
@@ -21,30 +17,12 @@
 				"description": "The name of the HDInsight cluster to create."
 			}
 		},
-		"clusterLoginUserName": {
-			"type": "string",
-			"metadata": {
-				"description": "These credentials can be used to submit jobs to the cluster and to log into cluster dashboards."
-			}
-		},
-		"clusterLoginPassword": {
-			"type": "securestring",
-			"metadata": {
-				"description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
-			}
-		},
-		"sshUserName": {
-			"type": "string",
-			"metadata": {
-				"description": "These credentials can be used to remotely access the cluster."
-			}
-		},
-		"sshPassword": {
-			"type": "securestring",
-			"metadata": {
-				"description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
-			}
-		}
+    "clusterSize": {
+      "type": "integer",
+      "metadata": {
+        "description": "The size of the cluster to create."
+      }
+    },
 	},
   "variables": {
     "defaultStorageAccount":{
@@ -79,8 +57,8 @@
           "configurations": {
             "gateway": {
               "restAuthCredential.isEnabled": true,
-              "restAuthCredential.username": "[parameters('clusterLoginUserName')]",
-              "restAuthCredential.password": "[parameters('clusterLoginPassword')]"
+              "restAuthCredential.username": "admin",
+              "restAuthCredential.password": "DojoGuest123$"
             }
           }
         },
@@ -104,21 +82,21 @@
               },
               "osProfile": {
                 "linuxOperatingSystemProfile": {
-                  "username": "[parameters('sshUserName')]",
-                  "password": "[parameters('sshPassword')]"
+                  "username": "sshuser",
+                  "password": "DojoGuest123$"
                 }
               }
             },
             {
               "name": "workernode",
-              "targetInstanceCount": 2,
+              "targetInstanceCount": "[parameters('clusterSize')]",
               "hardwareProfile": {
                 "vmSize": "Standard_D3"
               },
               "osProfile": {
                 "linuxOperatingSystemProfile": {
-                  "username": "[parameters('sshUserName')]",
-                  "password": "[parameters('sshPassword')]"
+                  "username": "sshuser",
+                  "password": "DojoGuest123$"
                 }
               }
             }
