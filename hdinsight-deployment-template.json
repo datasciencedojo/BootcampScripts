@@ -1,118 +1,121 @@
 {
-	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-	"contentVersion": "1.0.0.0",
-	"parameters": {
-		"clusterType": {
-			"type": "string",
-			"allowedValues": [
-        "hadoop"
-        ],
-			"metadata": {
-				"description": "The type of the HDInsight cluster to create."
-			}
-		},
-		"clusterName": {
-			"type": "string",
-			"metadata": {
-				"description": "The name of the HDInsight cluster to create."
-			}
-		},
-    "clusterSize": {
-      "type": "integer",
-      "metadata": {
-        "description": "The size of the cluster to create."
-      }
-    },
-	},
-  "variables": {
-    "defaultStorageAccount":{
-      "name": "[uniqueString(resourceGroup().id)]",
-      "type": "Standard_LRS"
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('defaultStorageAccount').name]",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2016-01-01",
-      "sku": {
-          "name": "[variables('defaultStorageAccount').type]"
-      },
-      "kind": "Storage", 
-      "properties": {}
-    },
-    {
-      "type": "Microsoft.HDInsight/clusters",
-      "name": "[parameters('clusterName')]",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2015-03-01-preview",
-      "dependsOn": [ 
-        "[concat('Microsoft.Storage/storageAccounts/',variables('defaultStorageAccount').name)]" ],
-      "properties": {
-        "clusterVersion": "3.5",
-        "osType": "Linux",
-        "clusterDefinition": {
-          "kind": "[parameters('clusterType')]",
-          "configurations": {
-            "gateway": {
-              "restAuthCredential.isEnabled": true,
-              "restAuthCredential.username": "admin",
-              "restAuthCredential.password": "DojoGuest123$"
+    "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion":"1.0.0.0",
+    "parameters":{
+        "clusterType":{
+            "type":"string",
+            "allowedValues":[
+                "hadoop"
+            ],
+            "metadata":{
+                "description":"The type of the HDInsight cluster to create."
             }
-          }
         },
-        "storageProfile": {
-          "storageaccounts": [
-            {
-              "name": "[replace(replace(concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('defaultStorageAccount').name), '2016-01-01').primaryEndpoints.blob),'https:',''),'/','')]",
-              "isDefault": true,
-              "container": "[parameters('clusterName')]",
-              "key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('defaultStorageAccount').name), '2016-01-01').keys[0].value]"
+        "clusterName":{
+            "type":"string",
+            "metadata":{
+                "description":"A unique name for the HDInsight cluster."
             }
-          ]
         },
-        "computeProfile": {
-          "roles": [
-            {
-              "name": "headnode",
-              "targetInstanceCount": 2,
-              "hardwareProfile": {
-                "vmSize": "Standard_D3"
-              },
-              "osProfile": {
-                "linuxOperatingSystemProfile": {
-                  "username": "sshuser",
-                  "password": "DojoGuest123$"
-                }
-              }
-            },
-            {
-              "name": "workernode",
-              "targetInstanceCount": "[parameters('clusterSize')]",
-              "hardwareProfile": {
-                "vmSize": "Standard_D3"
-              },
-              "osProfile": {
-                "linuxOperatingSystemProfile": {
-                  "username": "sshuser",
-                  "password": "DojoGuest123$"
-                }
-              }
+        "clusterSize":{
+            "type":"integer",
+            "metadata":{
+                "description":"The size of the cluster to create."
             }
-          ]
         }
-      }
-    }
-  ],
-	"outputs": {
-    "storage":{
-      "type": "object",
-      "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('defaultStorageAccount').name))]"
     },
-		"cluster": {
-			"type": "object",
-			"value": "[reference(resourceId('Microsoft.HDInsight/clusters',parameters('clusterName')))]"
-		}
-	}
+    "variables":{
+        "defaultStorageAccount":{
+            "name":"[uniqueString(resourceGroup().id)]",
+            "type":"Standard_LRS"
+        }
+    },
+    "resources":[
+        {
+            "type":"Microsoft.Storage/storageAccounts",
+            "name":"[variables('defaultStorageAccount').name]",
+            "location":"[resourceGroup().location]",
+            "apiVersion":"2016-01-01",
+            "sku":{
+                "name":"[variables('defaultStorageAccount').type]"
+            },
+            "kind":"Storage",
+            "properties":{
+
+            }
+        },
+        {
+            "type":"Microsoft.HDInsight/clusters",
+            "name":"[parameters('clusterName')]",
+            "location":"[resourceGroup().location]",
+            "apiVersion":"2015-03-01-preview",
+            "dependsOn":[
+                "[concat('Microsoft.Storage/storageAccounts/',variables('defaultStorageAccount').name)]"
+            ],
+            "properties":{
+                "clusterVersion":"3.5",
+                "osType":"Linux",
+                "clusterDefinition":{
+                    "kind":"[parameters('clusterType')]",
+                    "configurations":{
+                        "gateway":{
+                            "restAuthCredential.isEnabled":true,
+                            "restAuthCredential.username":"admin",
+                            "restAuthCredential.password":"DojoGuest123$"
+                        }
+                    }
+                },
+                "storageProfile":{
+                    "storageaccounts":[
+                        {
+                            "name":"[replace(replace(concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('defaultStorageAccount').name), '2016-01-01').primaryEndpoints.blob),'https:',''),'/','')]",
+                            "isDefault":true,
+                            "container":"[parameters('clusterName')]",
+                            "key":"[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('defaultStorageAccount').name), '2016-01-01').keys[0].value]"
+                        }
+                    ]
+                },
+                "computeProfile":{
+                    "roles":[
+                        {
+                            "name":"headnode",
+                            "targetInstanceCount":2,
+                            "hardwareProfile":{
+                                "vmSize":"Standard_D3"
+                            },
+                            "osProfile":{
+                                "linuxOperatingSystemProfile":{
+                                    "username":"sshuser",
+                                    "password":"DojoGuest123$"
+                                }
+                            }
+                        },
+                        {
+                            "name":"workernode",
+                            "targetInstanceCount":"[parameters('clusterSize')]",
+                            "hardwareProfile":{
+                                "vmSize":"Standard_D3"
+                            },
+                            "osProfile":{
+                                "linuxOperatingSystemProfile":{
+                                    "username":"sshuser",
+                                    "password":"DojoGuest123$"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs":{
+        "storage":{
+            "type":"object",
+            "value":"[reference(resourceId('Microsoft.Storage/storageAccounts', variables('defaultStorageAccount').name))]"
+        },
+        "cluster":{
+            "type":"object",
+            "value":"[reference(resourceId('Microsoft.HDInsight/clusters',parameters('clusterName')))]"
+        }
+    }
 }
