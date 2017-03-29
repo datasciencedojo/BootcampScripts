@@ -18,7 +18,7 @@
             }
         },
         "clusterSize":{
-            "type":"number"},
+            "type":"number",
             "metadata":{
                 "description":"The size of the cluster to create."
             }
